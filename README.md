@@ -1,61 +1,68 @@
+
 # ChecksumOfTCP
-Implementação do Checksum utilizado pelo protocolo TCP.
 
-## Funcionanmento
-O sistema simula a geração de uma mensagem de 16bits para envio, junto com a montagem do valor do checksum (em 16bits), validação do seu recebimento e exibição do dado. 
-
-- O sistema pegunta pra o usuário a mensagem que ele deseja enviar;
-- Pegunta se deseja simular um erro de envio/recebimento;
-- Valida o dado recebido;
-- Exibe o dados recebido ou o erro gerado;
+Implementation of the TCP protocol checksum in C#.
 
 
-##### Conversão da mensagem em dados de 16bits
-``` csharp
+## How It Works
+This project simulates the generation of a 16-bit message for transmission, calculates the checksum (16 bits), validates the received message, and displays the result.
+
+- The system asks the user for the message to send.
+- It asks if you want to simulate a transmission/reception error.
+- It validates the received data.
+- It displays the received data or the generated error.
+
+
+
+### Converting the Message to 16-bit Data
+```csharp
 private Message(string data, Encoding encoding)
 {
-    //Converte a mensagem de string para um array de 16bits
-    Data16Bits[] dataInInData16Bits = convertStringToData16Bits(data, encoding);
-    //Faz o checksum da mensagem
-    Data16Bits checksumData = checksum(dataInInData16Bits);
+    // Converts the string message to an array of 16-bit data
+    Data16Bits[] dataIn16Bits = convertStringToData16Bits(data, encoding);
+    // Calculates the checksum of the message
+    Data16Bits checksumData = checksum(dataIn16Bits);
 
-    //Junta a mensagem com o valor do checksum
-    Data16Bits[] datawithChecksum = dataInInData16Bits.Join(new[] { checksumData });
+    // Combines the message with the checksum value
+    Data16Bits[] dataWithChecksum = dataIn16Bits.Join(new[] { checksumData });
 
-    this.data = datawithChecksum;
+    this.data = dataWithChecksum;
 }
 ```
 
 
-##### Validação do dado
-``` csharp
+
+### Data Validation
+```csharp
 public void Validate()
 {
-    //Cria um dado com 16bits 1
+    // Creates a 16-bit data with all bits set to 1
     var checksumExpectedResult = new Data16Bits(true);
-    // Soma todo a dado da mensagem (inclusive com o checksum)
+    // Sums all the data in the message (including the checksum)
     var checksumResult = sumOfAll(data);
-    //Valida se o resultado da soma é um conjunto de 16bist com valor 1 em cada bit
+    // Validates if the sum result is a 16-bit set with all bits as 1
     if (!checksumResult.Equals(checksumExpectedResult))
         throw new Exception("Invalid message, checksum does not match");
 }
 ```
 
 
-##### Conversão dos dados de 16bits recebidos
-``` csharp
+
+### Unpacking Received 16-bit Data
+```csharp
 private string unpack(Encoding encoding)
 {
-    //Remove o dado de checksum da mensagem
-    var receivedDataWithOutChecksum = data.SubArray(0, data.Length - 1);
-    //Converte os dados em 16bits em string
-    string messageReceived = convert16BitArrayInString(receivedDataWithOutChecksum, encoding);
+    // Removes the checksum data from the message
+    var receivedDataWithoutChecksum = data.SubArray(0, data.Length - 1);
+    // Converts the 16-bit data array back to a string
+    string messageReceived = convert16BitArrayInString(receivedDataWithoutChecksum, encoding);
     return messageReceived;
 }
 ```
 
 
-## Referencias usadas para a implementação
+
+## References
 - https://en.wikipedia.org/wiki/Transmission_Control_Protocol#TCP_checksum_for_IPv4
 - https://tools.ietf.org/html/rfc793
 - https://www.slashroot.in/how-is-tcp-and-udp-checksum-calculated
